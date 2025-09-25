@@ -69,7 +69,7 @@ optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
 os.makedirs('checkpoints', exist_ok=True)
 
 # Training loop
-epochs = 300
+epochs = 3
 s = 0.1
 
 for epoch in range(epochs):
