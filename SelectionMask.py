@@ -3,6 +3,8 @@ import torch.nn.functional as F
 import torch.nn as nn
 import torch.optim as optim
 
+torch.set_default_device('cuda')
+
 
 class SelectionMask(nn.Module):    
     def __init__(self, shape, pre_mask=None) -> None:
