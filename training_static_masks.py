@@ -76,10 +76,10 @@ def test_model(test_loader, model, device):
 selection_mask = sm.SelectionMask(shape=(1,28,28)).to(device) # Move mask to device
 model = SimpleCNN(selection_mask).to(device)
 criterion = nn.NLLLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.9)
 
 # Create checkpoints directory
-os.makedirs('checkpoints', exist_ok=True)
+os.makedirs('trainings/1', exist_ok=True)
 
 # Training loop
 epochs = 300
@@ -124,7 +124,7 @@ for epoch in range(epochs):
         'accuracy': accuracy,
         's': s
     }
-    torch.save(checkpoint, f'checkpoints/checkpoint_epoch_{epoch + 1}.pt')
+    torch.save(checkpoint, f'trainings/1/checkpoint_epoch_{epoch + 1}.pt')
 
 # Save final model
 final_accuracy = test_model(test_loader, model, device)
@@ -136,4 +136,4 @@ torch.save({
     'loss': avg_loss,
     'accuracy': final_accuracy,
     's': s
-}, 'checkpoints/final_model.pt')
+}, 'trainings/1/final_model.pt')
