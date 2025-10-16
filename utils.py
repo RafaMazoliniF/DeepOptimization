@@ -34,9 +34,6 @@ def animate_notebook(frames, interval=50, cmap='viridis', figsize=(8, 6),
     >>> animate_notebook(frames, interval=100)
     """
     
-    # Converter para array numpy se necessário
-    frames = [np.asarray(frame) for frame in frames]
-    
     # Configurar figura
     fig, ax = plt.subplots(figsize=figsize)
     
