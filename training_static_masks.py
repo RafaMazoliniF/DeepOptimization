@@ -219,7 +219,7 @@ if __name__ == '__main__':
         "lambda_factor": 1.5,
         "lambda_patience": 5,
         "lambda_treshold": 0.2,
-        "training_id": "cnn_mnist_run_03" # Descriptive name for the training run
+        "training_id": "cnn_mnist_run_SGD_01" # Descriptive name for the training run
     }
     
     # Start training
