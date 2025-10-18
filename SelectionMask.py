@@ -20,7 +20,7 @@ class SelectionMask(nn.Module):
         Applies the binarized mask to an image keeping the grandient information
         """
         sig = torch.sigmoid(self.mask)
-        bin_mask = (sig > 0.5).float()
+        bin_mask = torch.round(sig).float()
         diff_mask = bin_mask + (sig - sig.detach())
         return x * diff_mask
 
@@ -30,6 +30,6 @@ def mask_l1_loss(mask: SelectionMask):
     Returns the percentage of the mask with a value of 1
     """
     sig = torch.sigmoid(mask.mask)
-    bin_mask = (sig > 0.5).float()
+    bin_mask = torch.round(sig).int()
     diff_mask = bin_mask + (sig - sig.detach())
     return diff_mask.sum() / diff_mask.numel()

@@ -211,16 +211,16 @@ def training_loop(config, optimizer_class=optim.Adam):
 if __name__ == '__main__':
     # Centralize all configurations here
     CONFIG = {
-        "n_epochs": 30,
-        "batch_size": 32,
-        "model_learning_rate": 0.0001,
-        "mask_learning_rate": 0.5,
+        "n_epochs": 200,
+        "batch_size": 128,
+        "model_learning_rate": 0.001,
+        "mask_learning_rate": 0.1,
         "lambda_init": 0.01,
         "lambda_factor": 1.5,
         "lambda_patience": 5,
         "lambda_treshold": 0.2,
-        "training_id": "cnn_mnist_run_SGD_01" # Descriptive name for the training run
+        "training_id": "cnn_mnist_run_ADAM_new_mask_01"
     }
     
     # Start training
-    training_loop(CONFIG, optimizer_class=optim.SGD)
+    training_loop(CONFIG, optimizer_class=optim.Adam)
