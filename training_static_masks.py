@@ -211,8 +211,8 @@ def training_loop(config, optimizer_class=optim.Adam):
 if __name__ == '__main__':
     # Centralize all configurations here
     CONFIG = {
-        "n_epochs": 400,
-        "batch_size": 256,
+        "n_epochs": 30,
+        "batch_size": 32,
         "model_learning_rate": 0.0001,
         "mask_learning_rate": 0.5,
         "lambda_init": 0.01,
