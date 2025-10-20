@@ -9,10 +9,62 @@ import SelectionMask as sm  # Custom module
 import numpy as np
 import argparse # To configure via command line
 
+
 # =============================================================================
 # 1. MODEL AND HELPER CLASS DEFINITIONS
 # (Well-defined classes can be grouped together)
 # =============================================================================
+
+class BasicBlock(nn.Module):
+    expansion = 1
+    def __init__(self, in_planes, planes, stride=1):
+        super(BasicBlock, self).__init__()
+        self.conv1 = nn.Conv2d(in_planes, planes, kernel_size=3, stride=stride, padding=1, bias=False)
+        self.bn1 = nn.BatchNorm2d(planes)
+        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=1, padding=1, bias=False)
+        self.bn2 = nn.BatchNorm2d(planes)
+        self.shortcut = nn.Sequential()
+        if stride != 1 or in_planes != planes:
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(in_planes, planes, kernel_size=1, stride=stride, bias=False),
+                nn.BatchNorm2d(planes)
+            )
+    def forward(self, x):
+        out = F.relu(self.bn1(self.conv1(x)))
+        out = self.bn2(self.conv2(out))
+        out += self.shortcut(x)
+        out = F.relu(out)
+        return out
+
+class ResNet_CIFAR(nn.Module):
+    def __init__(self, block, num_blocks, num_classes=10):
+        super(ResNet_CIFAR, self).__init__()
+        self.in_planes = 16
+        self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1, bias=False)
+        self.bn1 = nn.BatchNorm2d(16)
+        self.layer1 = self._make_layer(block, 16, num_blocks[0], stride=1)
+        self.layer2 = self._make_layer(block, 32, num_blocks[1], stride=2)
+        self.layer3 = self._make_layer(block, 64, num_blocks[2], stride=2)
+        self.linear = nn.Linear(64, num_classes)
+    def _make_layer(self, block, planes, num_blocks, stride):
+        strides = [stride] + [1]*(num_blocks-1)
+        layers = []
+        for s in strides:
+            layers.append(block(self.in_planes, planes, s))
+            self.in_planes = planes
+        return nn.Sequential(*layers)
+    def forward(self, x):
+        out = F.relu(self.bn1(self.conv1(x)))
+        out = self.layer1(out)
+        out = self.layer2(out)
+        out = self.layer3(out)
+        out = F.avg_pool2d(out, 8)
+        out = out.view(out.size(0), -1)
+        out = self.linear(out)
+        return out
+
+def resnet20(num_classes=10):
+    return ResNet_CIFAR(BasicBlock, [3, 3, 3], num_classes=num_classes)
 
 class SimpleCNN(nn.Module):
     def __init__(self):
@@ -68,16 +120,26 @@ class LambdaScheduler:
 def get_data_loaders(batch_size, validation_split=0.2, seed=42):
     """Encapsulates all data preparation logic."""
     print("Loading MNIST data...")
-    transform = transforms.Compose([
+    cifar_mean = (0.4914, 0.4822, 0.4465)
+    cifar_std  = (0.2470, 0.2435, 0.2616)
+
+    train_transform = transforms.Compose([
+        transforms.RandomCrop(32, padding=4),
+        transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
-        transforms.Normalize((0,), (1,))
+        transforms.Normalize(cifar_mean, cifar_std),
     ])
-    
+
+    test_transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize(cifar_mean, cifar_std),
+    ])
+        
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     generator = torch.Generator(device=device).manual_seed(seed)
 
-    train_dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transform)
-    test_dataset = datasets.MNIST(root='./data', train=False, download=True, transform=transform)
+    train_dataset = datasets.CIFAR10(root='./data/cifar', train=True, download=True, transform=train_transform)
+    test_dataset = datasets.CIFAR10(root='./data/cifar', train=False, download=True, transform=test_transform)
 
     n_val = int(len(train_dataset) * validation_split)
     n_train = len(train_dataset) - n_val
@@ -145,9 +207,10 @@ def training_loop(config, optimizer_class=optim.Adam):
     train_loader, val_loader, _ = get_data_loaders(config['batch_size'])
     
     # Models and training components
-    model = SimpleCNN().to(device)
-    mask_model = sm.SelectionMask(shape=(1, 28, 28)).to(device)
-    criterion = nn.NLLLoss()
+    model = resnet20(num_classes=10).to(device)
+    mask_model = sm.SelectionMask(shape=(3, 32, 32)).to(device)
+    criterion = nn.CrossEntropyLoss()
+
     optimizer_kwargs = {}
     if optimizer_class == optim.SGD:
         optimizer_kwargs['momentum'] = 0.9
@@ -211,15 +274,15 @@ def training_loop(config, optimizer_class=optim.Adam):
 if __name__ == '__main__':
     # Centralize all configurations here
     CONFIG = {
-        "n_epochs": 200,
+        "n_epochs": 50,
         "batch_size": 128,
-        "model_learning_rate": 0.001,
+        "model_learning_rate": 0.00001,
         "mask_learning_rate": 0.1,
         "lambda_init": 0.01,
         "lambda_factor": 1.5,
         "lambda_patience": 5,
         "lambda_treshold": 0.2,
-        "training_id": "cnn_mnist_run_ADAM_new_mask_01"
+        "training_id": "resNet_cifar10_run_ADAM_01"
     }
     
     # Start training

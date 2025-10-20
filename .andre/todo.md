@@ -2,6 +2,7 @@
 
 ## Literatura
 [] Reler paper
+[] Ver material rafael - PDF
 
 ### Pytorch 
 [] Pytorch - https://www.learnpytorch.io/
@@ -9,7 +10,7 @@
 [] First 5 sections - https://www.youtube.com/watch?v=Z_ikDlimN6A
 
 ## Estudo prático
-[] Entender implementação da nossa estrutura em uma imagem RGB
+[X] Entender implementação da nossa estrutura em uma imagem RGB
 [] Entender a implementação de uma CNN em RGB
 [] Entender a implementação de uma ResNet na nossa situação
 [] Aplicar a implementação nossa em RGB
@@ -19,3 +20,7 @@
 [] Realizar testes no CIFAR10
 [] Realizar testes no galaxy10
 [] Realizar testes no svhn
+
+## Tasks
+[] Verificar mask_loss do ResNet
+[] Entender o que está acontecendo no ResNet
