@@ -82,7 +82,7 @@ def grid_training(function,config, var_modify, initial_value, final_value, step,
         "lambda_factor": config['lambda_factor'],
         "lambda_patience": config['lambda_patience'],
         "lambda_treshold": config['lambda_treshold'],
-        "training_id": config['training_id'] + "_gdt_" + str(i)
+        "training_id": config['training_id'] + "_gdt_" + var_modify + str(round(initial_value + i * step,6))
         # Descriptive name for the training run
         }
 
