@@ -6,12 +6,13 @@ from IPython.display import HTML
 def animate_notebook(frames, interval=50, cmap='viridis', figsize=(8, 6), 
                      colorbar=True, title_prefix='Frame', vmin=0, vmax=1):
     """
-    Anima uma lista de frames (imagens) no Jupyter Notebook.
+    Anima uma lista de frames (imagens 2D ou 3D) no Jupyter Notebook.
+    Se os frames forem 3D (com canais), cada canal será exibido em um subplot separado.
     
     Parameters:
     -----------
     frames : list ou array
-        Lista de frames (arrays 2D) para animar
+        Lista de frames para animar. Cada frame pode ser um array 2D (H, W) ou 3D (C, H, W).
     interval : int, optional
         Tempo entre frames em milissegundos (default: 50)
     cmap : str, optional
@@ -21,7 +22,7 @@ def animate_notebook(frames, interval=50, cmap='viridis', figsize=(8, 6),
     colorbar : bool, optional
         Se True, adiciona colorbar (default: True)
     title_prefix : str, optional
-        Prefixo para o título de cada frame (default: 'Frame')
+        Prefixo para o título de cada animação (default: 'Frame')
     
     Returns:
     --------
@@ -34,28 +35,48 @@ def animate_notebook(frames, interval=50, cmap='viridis', figsize=(8, 6),
     >>> animate_notebook(frames, interval=100)
     """
     
-    # Configurar figura
-    fig, ax = plt.subplots(figsize=figsize)
+    first_frame = np.array(frames[0])
+    is_multichannel = first_frame.ndim == 3
+    num_channels = first_frame.shape[0] if is_multichannel else 1
+
+    # Ajusta o tamanho da figura para acomodar os subplots
+    if is_multichannel:
+        fig_width, fig_height = figsize
+        figsize = (fig_width * num_channels, fig_height)
+
+    # Configura a figura e os subplots
+    fig, axes = plt.subplots(1, num_channels, figsize=figsize, squeeze=False)
+    axes = axes.flatten() # Garante que axes seja sempre um array iterável
     
-    # Plotar primeiro frame
-    im = ax.imshow(frames[0], cmap=cmap, animated=True, 
-                   vmin=vmin, vmax=vmax, origin='lower')
-    
-    if colorbar:
-        plt.colorbar(im, ax=ax)
-    
-    ax.grid(False)
-    ax.set_title(f'{title_prefix} 0')
+    # Plota o primeiro frame em cada subplot
+    images = []
+    for i in range(num_channels):
+        ax = axes[i]
+        frame_data = first_frame[i] if is_multichannel else first_frame
+        im = ax.imshow(frame_data, cmap=cmap, animated=True, 
+                       vmin=vmin, vmax=vmax, origin='lower')
+        images.append(im)
+        
+        if colorbar:
+            fig.colorbar(im, ax=ax)
+        
+        ax.grid(False)
+        title = f'Channel {i} - {title_prefix} 0' if is_multichannel else f'{title_prefix} 0'
+        ax.set_title(title)
     
     # Função de atualização
     def update(frame_idx):
-        im.set_array(frames[frame_idx])
-        ax.set_title(f'{title_prefix} {frame_idx}')
-        return [im]
+        current_frames = np.array(frames[frame_idx])
+        for i in range(num_channels):
+            frame_data = current_frames[i] if is_multichannel else current_frames
+            images[i].set_array(frame_data)
+            title = f'Channel {i} - {title_prefix} {frame_idx}' if is_multichannel else f'{title_prefix} {frame_idx}'
+            axes[i].set_title(title)
+        return images
     
     # Criar animação
     ani = FuncAnimation(fig, update, frames=len(frames), 
-                       interval=interval, blit=True, repeat=True)
+                       interval=interval, blit=True, repeat=False)
     
     plt.close(fig)  # Evita plotar a figura estática
     
@@ -104,6 +125,3 @@ def grid_training(function,config, var_modify, initial_value, final_value, step,
             print(f"Processo finalizado: {future.result()}")
 
     print("Finished all the processes.")
-
-
-
