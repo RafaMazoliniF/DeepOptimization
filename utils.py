@@ -28,7 +28,9 @@ def animate_notebook(frames, interval=50, cmap='viridis', figsize=(8, 6),
     --------
     IPython.display.HTML
         Objeto HTML com a animação
-    
+    ((1 / (1 + np.exp(-frame_data))), cmap=cmap, animated=True, 
+                       vmin=vmin, vmax=vmax, origin='lower')
+        images.append(im)
     Example:
     --------
     >>> frames = [np.random.rand(100, 100) for _ in range(50)]
@@ -53,7 +55,7 @@ def animate_notebook(frames, interval=50, cmap='viridis', figsize=(8, 6),
     for i in range(num_channels):
         ax = axes[i]
         frame_data = first_frame[i] if is_multichannel else first_frame
-        im = ax.imshow(frame_data, cmap=cmap, animated=True, 
+        im = ax.imshow(np.round(1 / (1 + np.exp(-frame_data))), cmap=cmap, animated=True, 
                        vmin=vmin, vmax=vmax, origin='lower')
         images.append(im)
         
