@@ -277,12 +277,12 @@ if __name__ == '__main__':
         "n_epochs": 50,
         "batch_size": 128,
         "model_learning_rate": 0.00001,
-        "mask_learning_rate": 0.1,
+        "mask_learning_rate": 0.001,
         "lambda_init": 0.01,
         "lambda_factor": 1.5,
         "lambda_patience": 5,
         "lambda_treshold": 0.2,
-        "training_id": "resNet_cifar10_run_ADAM_01"
+        "training_id": "resNet_cifar10_run_ADAM_02"
     }
     
     # Start training

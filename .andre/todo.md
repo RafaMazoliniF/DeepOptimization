@@ -2,7 +2,7 @@
 
 ## Literatura
 [] Reler paper
-[] Ver material rafael - PDF
+[] Ver material rafael - PDF (Livro sobre DL)
 
 ### Pytorch 
 [] Pytorch - https://www.learnpytorch.io/
@@ -24,3 +24,4 @@
 ## Tasks
 [] Verificar mask_loss do ResNet
 [] Entender o que está acontecendo no ResNet
+[] Mudar o grid_training pra receber geometrica ou aritimética
