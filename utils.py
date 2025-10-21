@@ -90,7 +90,7 @@ def grid_training(function,config, var_modify, initial_value, final_value, step,
     
     list_config = []
 
-    num_process = int(math.floor((final_value-initial_value)/step)) + 3
+    num_process = int(math.floor((final_value-initial_value)/step)) + 1
 
     for i in range(num_process):
 
@@ -103,13 +103,11 @@ def grid_training(function,config, var_modify, initial_value, final_value, step,
         "lambda_factor": config['lambda_factor'],
         "lambda_patience": config['lambda_patience'],
         "lambda_treshold": config['lambda_treshold'],
-        "training_id": config['training_id'] 
+        "training_id": config['training_id'] + "_gdt_" + var_modify + str(round(initial_value + i * step,6))
         # Descriptive name for the training run
         }
 
-        temp[var_modify] = initial_value * (step ** i)
-
-        temp['training_id'] = config['training_id'] + "_gdt_" + var_modify + str(round(temp[var_modify],6))
+        temp[var_modify] = initial_value + i * step
 
         list_config.append(temp)
 
