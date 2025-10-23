@@ -1,4 +1,6 @@
-This repo is a fork of our official repo for better understanding and visualization. The main branch is highly outdated; please focus on the others.
+This repo is a fork of our official repo for better understanding and visualization. 
+
+The main branch is highly outdated; please focus on the others.
 
 ## What do we have here?
 We first studied PyTorch, then began to study and implement the paper https://arxiv.org/abs/1906.04673
